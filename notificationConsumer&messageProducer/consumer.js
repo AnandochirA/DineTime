@@ -2,20 +2,16 @@ import { connect } from 'amqplib';
 
 async function startConsumer() {
     try {
-        // Connect to RabbitMQ server
         const connection = await connect('amqp://anand:2004anand@10.204.4.76');
         const channel = await connection.createChannel();
 
-        // Declare the notification queue
         const NOTIFICATION_QUEUE = 'notification-queue';
         await channel.assertQueue(NOTIFICATION_QUEUE, { durable: true });
 
-        // Declare the exchanges for each target queue
         const SYSTEM_EXCHANGE = 'system_exchange';
         const SMS_EXCHANGE = 'SMS_exchange';
         const EMAIL_EXCHANGE = 'email_exchange';
 
-        // Declare the target queues
         const SYSTEM_QUEUE = 'system-queue';
         const SMS_QUEUE = 'SMS-queue';
         const EMAIL_QUEUE = 'email-queue';
@@ -24,14 +20,12 @@ async function startConsumer() {
         await channel.assertQueue(SMS_QUEUE, { durable: true });
         await channel.assertQueue(EMAIL_QUEUE, { durable: true });
 
-        // Bind each queue to its corresponding exchange
         await channel.bindQueue(SYSTEM_QUEUE, SYSTEM_EXCHANGE, 'system');
         await channel.bindQueue(SMS_QUEUE, SMS_EXCHANGE, 'sms');
         await channel.bindQueue(EMAIL_QUEUE, EMAIL_EXCHANGE, 'email');
 
         console.log(`Waiting for messages in ${NOTIFICATION_QUEUE}...`);
 
-        // Consume messages from the notification queue
         channel.consume(NOTIFICATION_QUEUE, (msg) => {
             if (msg !== null) {
                 const messageContent = msg.content.toString();
@@ -63,7 +57,6 @@ async function startConsumer() {
                 channel.publish(EMAIL_EXCHANGE, 'email', Buffer.from(JSON.stringify(emailMessage)), { persistent: true });
                 console.log('Sent Notification to email queue');
 
-                // Acknowledge the original message
                 channel.ack(msg);
             }
         });
