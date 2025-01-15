@@ -1,4 +1,5 @@
 Food Order Management and Notification System
+
 Overview
 This project is a robust, distributed system designed to manage food orders and send notifications efficiently. By leveraging RabbitMQ, Node.js, Django, and MySQL, the system ensures high performance, scalability, and reliability for modern food delivery platforms.
 
